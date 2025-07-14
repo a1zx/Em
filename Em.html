@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Choose product</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand: #23242a;
+      --bg: #eaf1f4;
+      --btn: #fff;
+      --btn-shadow: 0 4px 18px #b6c7ce2a;
+      --green: #35d889;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      width: 100vw; min-height: 100vh;
+      background: var(--bg);
+      font-family: 'Fredoka One', Arial, sans-serif;
+      color: var(--brand);
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      width: 100vw;
+      justify-content: flex-start;
+      position: relative;
+    }
+    .container {
+      width: 100%;
+      max-width: 450px;
+      margin: 0 auto;
+      padding-top: 26px;
+      padding-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .title {
+      font-size: 2.1rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+      letter-spacing: .03em;
+      user-select: none;
+      text-shadow: 0 2px 0 #fff;
+    }
+    /* Категории */
+    .category-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      margin-top: 10px;
+      align-items: center;
+      animation: appear .55s;
+    }
+    @keyframes appear {
+      from { opacity:0; transform: translateY(34px);}
+      to   { opacity:1; transform: none;}
+    }
+    .cat-btn {
+      width: 92%;
+      max-width: 350px;
+      background: var(--btn);
+      color: var(--brand);
+      font-size: 1.53rem;
+      font-family: inherit;
+      font-weight: bold;
+      border: none;
+      border-radius: 22px;
+      padding: 24px 0;
+      margin: 0 auto;
+      box-shadow: var(--btn-shadow);
+      text-align: center;
+      letter-spacing: .01em;
+      transition: box-shadow .16s, background .14s, color .14s;
+      cursor: pointer;
+      margin-bottom: 2px;
+      outline: none;
+    }
+    .cat-btn:active {
+      background: #f1f2f5;
+      color: #41cdb3;
+      box-shadow: 0 2px 12px #b4d0fa44;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 24px;
+      width: 97%;
+      animation: appear .6s;
+    }
+    .prod-tile {
+      background: #fff;
+      border-radius: 17px;
+      padding: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 3px 12px #a8d6ce18;
+      border: 3px solid transparent;
+      transition: border .13s, box-shadow .14s;
+      min-height: 88px;
+      position: relative;
+    }
+    .prod-tile.selected {
+      border: 3px solid #30eb99;
+      box-shadow: 0 3px 19px #30d79a36;
+    }
+    .prod-img {
+      width: 75px; height: 75px; object-fit: contain;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+      background: none;
+      z-index: 1;
+    }
+    .take-btn {
+      display: block;
+      width: 92%;
+      max-width: 350px;
+      background: var(--btn);
+      color: var(--brand);
+      font-size: 2rem;
+      font-family: inherit;
+      font-weight: bold;
+      border: none;
+      border-radius: 21px;
+      padding: 22px 0;
+      margin: 13px auto 0 auto;
+      box-shadow: var(--btn-shadow);
+      text-align: center;
+      letter-spacing: .04em;
+      margin-bottom: 4px;
+      cursor: pointer;
+      outline: none;
+      transition: box-shadow .13s, color .16s;
+      text-shadow: 1.5px 1.5px 0 #bbb, 0 0 0 #fff;
+    }
+    .take-btn:active { color: #21b87a; }
+    .take-btn.animating { filter: blur(1.5px) brightness(0.97) grayscale(0.22);}
+    .blur-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 120;
+      backdrop-filter: blur(7px);
+      background: rgba(185, 200, 225, 0.22);
+      animation: blurIn .19s;
+    }
+    @keyframes blurIn { from{backdrop-filter: blur(0);} to{backdrop-filter: blur(7px);} }
+    .box-anim {
+      position: fixed;
+      left: 50%; top: 53%;
+      z-index: 200;
+      transform: translate(-50%, -50%);
+      width: 380px; height: 250px;
+      pointer-events: none;
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    }
+    @media (max-width:500px){
+      .box-anim{width:99vw;max-width:99vw;}
+      .gifbox{width:90vw;max-width:370px;}
+    }
+    .gifbox {
+      width: 360px; height: 210px;
+      position: absolute;
+      left: 50%; top: 25px;
+      transform: translateX(-50%);
+      z-index: 4;
+      pointer-events: none;
+      user-select: none;
+      display: block;
+    }
+    /* Галочка */
+    .check-anim-bg {
+      position: fixed;
+      top:0;left:0;right:0;bottom:0;
+      z-index:300;
+      background:rgba(244,249,245,0.31);
+      backdrop-filter: blur(8px);
+      display:flex;align-items:center;justify-content:center;
+      animation: fadein .18s;
+      pointer-events:none;
+    }
+    .check-anim{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      animation:pop .34s cubic-bezier(.75,1.5,.58,1.06);
+    }
+    @keyframes pop{0%{transform:scale(.78);opacity:.1;} 70%{transform:scale(1.09);} 100%{transform:scale(1);opacity:1;}}
+    .big-check{
+      width:112px;height:112px;
+      border-radius:50%;
+      background:linear-gradient(120deg,#e6f9de 60%,#b9eebc 100%);
+      display:flex;align-items:center;justify-content:center;
+      margin-bottom:32px;
+      box-shadow:0 7px 38px #b9eebc44,0 0 0 22px #daf9e71c;
+    }
+    .big-check svg{width:70px;height:70px;}
+    .check-text{
+      font-size:1.37rem;
+      font-weight:900;
+      color:#33bb6a;
+      margin-top:8px;
+      text-align:center;
+      text-shadow:0 3px 14px #b9eebc36;
+      letter-spacing:.01em;
+      font-family:'Fredoka One',Arial,sans-serif;
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="mainContainer">
+  <div class="title" id="mainTitle">Choose product</div>
+  <div class="category-list" id="categoryList">
+    <button class="cat-btn" data-cat="perfumes">Perfumes</button>
+    <button class="cat-btn" data-cat="sweets">Sweets</button>
+    <button class="cat-btn" data-cat="electronics">Electronics</button>
+    <button class="cat-btn" data-cat="clothing">Clothing</button>
+    <button class="cat-btn" data-cat="food">Food</button>
+  </div>
+</div>
+<!-- Box animation -->
+<div id="animBlur" style="display:none;">
+  <div class="blur-bg"></div>
+  <div class="box-anim" id="boxAnim"></div>
+</div>
+<div id="checkAnim" style="display:none"></div>
+<script>
+  const PRODUCTS = {
+    perfumes: [
+      "https://i.ibb.co/tptXV7LV/87bd8f651ac9448523939f7a938dc3dc.png",
+      "https://i.ibb.co/HL0hRHFQ/2-cc014589-577b-40b7-82b6-32de21e46667.png",
+      "https://i.ibb.co/7JGjYv2P/DIOR-HOMME-PARFUM-2025.png",
+      "https://i.ibb.co/qYXkgC8P/armani-stronger-with-you-pour-homme-eau-de-toilette-30ml.png",
+      "https://i.ibb.co/mr8FtZjD/armani-stronger-with-you-swy-parfum-2025.png",
+      "https://i.ibb.co/J9WT1Rq/yis-YKjdx-Cc-Wx-Jct-UBccg-LT.png",
+      "https://i.ibb.co/35hbftxd/louis-vuitton-myriad-LP0350-PM2-Front-view.webp"
+    ],
+    sweets: [
+      "https://i.ibb.co/WsqJ3Lq/sweets1.png",
+      "https://i.ibb.co/6b1hv61/sweets2.png",
+      "https://i.ibb.co/vzmKv5D/sweets3.png",
+      "https://i.ibb.co/NTDdc0y/sweets4.png",
+      "https://i.ibb.co/8YqW6M8/sweets5.png",
+      "https://i.ibb.co/3BhkP2Q/sweets6.png"
+    ],
+    electronics: [
+      "https://i.ibb.co/yfqKr8P/tech1.png",
+      "https://i.ibb.co/kQkrfRW/tech2.png",
+      "https://i.ibb.co/LJWrM3j/tech3.png",
+      "https://i.ibb.co/ZXwSjzj/tech4.png",
+      "https://i.ibb.co/nwpppqp/tech5.png",
+      "https://i.ibb.co/FnNY3Nw/tech6.png"
+    ],
+    clothing: [
+      "https://i.ibb.co/6rWrVJQ/clothes1.png",
+      "https://i.ibb.co/7Kk85n0/clothes2.png",
+      "https://i.ibb.co/FmgR0Px/clothes3.png",
+      "https://i.ibb.co/bK0yYS4/clothes4.png",
+      "https://i.ibb.co/Jyc6VgD/clothes5.png",
+      "https://i.ibb.co/VLD9zxV/clothes6.png"
+    ],
+    food: [
+      "https://i.ibb.co/HTb4kbs/food1.png",
+      "https://i.ibb.co/gjtPN7w/food2.png",
+      "https://i.ibb.co/2KQwQHg/food3.png",
+      "https://i.ibb.co/q5HztVp/food4.png",
+      "https://i.ibb.co/Qnvd5w3/food5.png",
+      "https://i.ibb.co/D8fQF54/food6.png"
+    ]
+  };
+
+  let selectedCat = null;
+  let selected = [];
+
+  document.querySelectorAll('.cat-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+      selectedCat = btn.dataset.cat;
+      showProducts(selectedCat);
+    };
+  });
+
+  function showProducts(cat) {
+    const cont = document.getElementById('mainContainer');
+    document.getElementById('mainTitle').textContent = "Choose product";
+    document.getElementById('categoryList').style.display = "none";
+    let grid = document.createElement('div');
+    grid.className = "products-grid";
+    selected = Array(PRODUCTS[cat].length).fill(false);
+    for(let i=0;i<PRODUCTS[cat].length;i++){
+      const tile = document.createElement('div');
+      tile.className = 'prod-tile';
+      tile.innerHTML = `<img class="prod-img" src="${PRODUCTS[cat][i]}" alt="product">`;
+      tile.onclick = ()=>{ selected[i]=!selected[i]; updateGrid(grid,cat);}
+      grid.appendChild(tile);
+    }
+    let btn = document.createElement('button');
+    btn.className = 'take-btn';
+    btn.textContent = "Take";
+    btn.onclick = ()=>startAnim();
+    let wrap = document.createElement('div');
+    wrap.className = 'products-list';
+    wrap.appendChild(grid);
+    wrap.appendChild(btn);
+    let old = cont.querySelector('.products-list');
+    if(old) old.remove();
+    cont.appendChild(wrap);
+  }
+  function updateGrid(grid,cat) {
+    for(let i=0;i<PRODUCTS[cat].length;i++){
+      let tile = grid.children[i];
+      if(selected[i]) tile.classList.add('selected');
+      else tile.classList.remove('selected');
+    }
+  }
+
+  function startAnim() {
+    document.querySelector('.take-btn').classList.add('animating');
+    document.getElementById('animBlur').style.display = 'block';
+    const boxAnim = document.getElementById('boxAnim');
+    boxAnim.innerHTML = `
+      <img src="https://i.ibb.co/B5GkW2Gb/original-0729685bddace62296358-unscreen.gif" class="gifbox" alt="box gif">
+    `;
+    setTimeout(()=>{
+      document.getElementById('animBlur').style.display = 'none';
+      showCheckAnim();
+    }, 1400);
+  }
+
+  function showCheckAnim(){
+    const check = document.getElementById('checkAnim');
+    check.innerHTML = `
+      <div class="check-anim-bg">
+        <div class="check-anim">
+          <div class="big-check">
+            <svg width="70" height="70" viewBox="0 0 50 50">
+              <polyline points="14,27 24,37 39,14" fill="none" stroke="#39db8e" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="check-text">Item is on the way!</div>
+        </div>
+      </div>
+    `;
+    check.style.display = "flex";
+    setTimeout(()=>{
+      check.style.display = "none";
+      document.querySelector('.products-list').remove();
+      document.getElementById('mainTitle').textContent = "Choose product";
+      document.getElementById('categoryList').style.display = "flex";
+      document.querySelector('.take-btn')?.classList.remove('animating');
+    }, 2200);
+  }
+</script>
+</body>
+</html>
