@@ -179,6 +179,47 @@
       user-select: none;
       display: block;
     }
+    /* Loading Bar */
+    .packing-bar-wrap {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      z-index: 400;
+      animation: barshow .28s;
+    }
+    @keyframes barshow { from { opacity:0; transform:translateY(-30px);} to{opacity:1; transform:none;} }
+    .packing-bar {
+      margin-top: 22px;
+      min-width: 230px;
+      max-width: 95vw;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 26px #b6e4c832, 0 2px 0 #aeeaee08;
+      padding: 18px 28px 16px 28px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 18px;
+      font-size: 1.18em;
+      font-weight: 700;
+      color: #31a684;
+      letter-spacing: .01em;
+      border: 2.5px solid #b8e4cc;
+      position: relative;
+      user-select: none;
+    }
+    .packing-loader {
+      width: 36px; height: 36px;
+      border: 4.5px solid #c6eddc;
+      border-top: 4.5px solid #35d889;
+      border-radius: 50%;
+      animation: spin 0.77s linear infinite;
+      margin-right: 3px;
+      flex-shrink: 0;
+    }
+    @keyframes spin { 0% { transform:rotate(0); } 100% { transform:rotate(360deg); } }
     /* Галочка */
     .check-anim-bg {
       position: fixed;
@@ -232,6 +273,7 @@
   <div class="blur-bg"></div>
   <div class="box-anim" id="boxAnim"></div>
 </div>
+<div id="packingBar" style="display:none"></div>
 <div id="checkAnim" style="display:none"></div>
 <script>
   const PRODUCTS = {
@@ -322,17 +364,41 @@
     }
   }
 
+  // --- главное изменение тут ---
   function startAnim() {
     document.querySelector('.take-btn').classList.add('animating');
-    document.getElementById('animBlur').style.display = 'block';
-    const boxAnim = document.getElementById('boxAnim');
-    boxAnim.innerHTML = `
-      <img src="https://i.ibb.co/B5GkW2Gb/original-0729685bddace62296358-unscreen.gif" class="gifbox" alt="box gif">
-    `;
+    // Показываем полоску упаковки
+    showPackingBar();
+    // Через 1.3 сек — коробка
     setTimeout(()=>{
-      document.getElementById('animBlur').style.display = 'none';
-      showCheckAnim();
-    }, 1400);
+      hidePackingBar();
+      document.getElementById('animBlur').style.display = 'block';
+      const boxAnim = document.getElementById('boxAnim');
+      boxAnim.innerHTML = `
+        <img src="https://i.ibb.co/B5GkW2Gb/original-0729685bddace62296358-unscreen.gif" class="gifbox" alt="box gif">
+      `;
+      setTimeout(()=>{
+        document.getElementById('animBlur').style.display = 'none';
+        showCheckAnim();
+      }, 1400);
+    }, 1300);
+  }
+
+  // Показываем полоску
+  function showPackingBar() {
+    const bar = document.getElementById('packingBar');
+    bar.innerHTML = `
+      <div class="packing-bar-wrap">
+        <div class="packing-bar">
+          <div class="packing-loader"></div>
+          Packing your item...
+        </div>
+      </div>
+    `;
+    bar.style.display = "block";
+  }
+  function hidePackingBar() {
+    document.getElementById('packingBar').style.display = "none";
   }
 
   function showCheckAnim(){
